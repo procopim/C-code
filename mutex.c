@@ -6,12 +6,12 @@
 from bank account, using mutex locks to solve for critical section 
 race conditions */
 
-
+/*runner function declarations*/
 void *deposit(int *amt);
 void *withdraw(int *amt);
 
 #define NUM_THREADS 6
-
+/*global var representing account balance*/
 int acctbalance;
 
 /*declare global mutex*/
@@ -20,10 +20,12 @@ pthread_mutex_t mutex;
 int main (int argc, char *argv[]){
 
     acctbalance = 0;
-
+    
+    /*convert char input to int*/
     int dep = atoi(argv[1]);
     int wtd = atoi(argv[2]);
-
+    
+    /*declare array of id and attr types*/
     pthread_t transactions[NUM_THREADS];
     pthread_attr_t transattr[NUM_THREADS];
 
@@ -42,25 +44,11 @@ int main (int argc, char *argv[]){
         pthread_attr_init(&transattr[i]);
         pthread_create(&transactions[i], &transattr[i], withdraw, &wtd);
     };
-
+    
+    /*ensure parents thread awaits return of all created threads*/
     for (int i = 0; i < NUM_THREADS; i++){
         pthread_join(transactions[i], NULL);
     }
-
-    // /*withdraw threads*/
-    // pthread_t wd1; 
-    // pthread_attr_t attr_wd1; 
-    // pthread_t wd2; 
-    // pthread_attr_t attr_wd2; 
-    // pthread_t wd3; 
-    // pthread_attr_t attr_wd3; 
-    // /*deposit threads*/
-    // pthread_t dp1; 
-    // pthread_attr_t attr_dp1; 
-    // pthread_t dp2; 
-    // pthread_attr_t attr_dp2; 
-    // pthread_t dp3;
-    // pthread_attr_t attr_dp3; 
 
     printf("\n Final amt: %d \n", acctbalance);
     return 0;
@@ -75,7 +63,7 @@ void *deposit(int *amt){
 }
 
 void *withdraw(int *amt){
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&mutex); 
     acctbalance = (int)(acctbalance - *amt);
     pthread_mutex_unlock(&mutex);
     printf("\n Withdraw amt: %d \n", acctbalance);
